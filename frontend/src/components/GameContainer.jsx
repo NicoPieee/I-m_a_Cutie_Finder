@@ -96,10 +96,11 @@ const GameContainer = () => {
 
   // ===== タイトル背景用のキャラ画像 =====
   useEffect(() => {
+    if (screen !== 'welcome') return undefined;
     let cancelled = false;
     const loadWelcomeCards = async () => {
       try {
-        const { cards } = await fetchPrioritizedCards(14);
+        const { cards } = await fetchPrioritizedCards(48);
         if (cancelled) return;
         const next = Array.isArray(cards) ? cards.filter((card) => card?.imageUrl) : [];
         setWelcomeCards(next);
@@ -108,37 +109,55 @@ const GameContainer = () => {
         if (!cancelled) setWelcomeCards([]);
       }
     };
+
     loadWelcomeCards();
+    const timer = setInterval(loadWelcomeCards, 15000);
+
     return () => {
       cancelled = true;
+      clearInterval(timer);
     };
-  }, []);
+  }, [screen]);
 
-  const welcomeBackgroundCards = useMemo(() => {
-    return (welcomeCards || []).slice(0, 12).map((card, idx) => {
-      const col = idx % 4;
-      const row = Math.floor(idx / 4);
-      const left = 14 + col * 24 + (row % 2 === 0 ? -2 : 2);
-      const top = 14 + row * 27 + (idx % 3 - 1) * 2;
-      const duration = 8 + (idx % 4) * 2.2;
-      const delay = -1.1 * (idx % 6);
-      const size = 76 + (idx % 5) * 10;
-      const rotate = (idx % 2 === 0 ? -1 : 1) * (4 + (idx % 3));
-      const opacity = 0.24 + (idx % 4) * 0.08;
+  const welcomeMarqueeRows = useMemo(() => {
+    const source = (welcomeCards || []).filter((card) => card?.imageUrl);
+    if (source.length === 0) return [];
+
+    const rowCount = 4;
+    const rows = Array.from({ length: rowCount }, () => []);
+    source.forEach((card, idx) => {
+      rows[idx % rowCount].push(card);
+    });
+
+    return rows.map((rowCards, rowIdx) => {
+      const cardsForRow = rowCards.length > 0 ? rowCards : source;
+      const duplicated = [...cardsForRow, ...cardsForRow];
 
       return {
-        key: `${card.id || idx}-${idx}`,
-        imageUrl: card.imageUrl,
-        positionStyle: { left: `${left}%`, top: `${top}%` },
-        floatStyle: {
-          '--float-duration': `${duration}s`,
-          '--float-delay': `${delay}s`,
+        key: `row-${rowIdx}`,
+        directionClass: rowIdx % 2 === 0 ? 'is-left' : 'is-right',
+        trackStyle: {
+          '--marquee-duration': `${30 + rowIdx * 4}s`,
+          '--marquee-delay': `${rowIdx * -2.5}s`,
         },
-        imageStyle: {
-          '--card-size': `${size}px`,
-          '--card-tilt': `${rotate}deg`,
-          '--card-opacity': String(opacity),
-        },
+        cards: duplicated.map((card, cardIdx) => {
+          const tiltBase = (cardIdx + rowIdx) % 2 === 0 ? -1 : 1;
+          const tilt = tiltBase * (3 + ((cardIdx + rowIdx) % 3));
+          const size = 112 + ((cardIdx + rowIdx) % 5) * 10;
+          const opacity = 0.24 + ((cardIdx + rowIdx) % 4) * 0.08;
+          const bobDelay = (cardIdx % 7) * -0.7;
+
+          return {
+            key: `${card.id || cardIdx}-${rowIdx}-${cardIdx}`,
+            imageUrl: card.imageUrl,
+            style: {
+              '--card-size': `${size}px`,
+              '--card-tilt': `${tilt}deg`,
+              '--card-opacity': String(opacity),
+              '--bob-delay': `${bobDelay}s`,
+            },
+          };
+        }),
       };
     });
   }, [welcomeCards]);
@@ -389,19 +408,19 @@ const GameContainer = () => {
       {screen === 'welcome' && (
         <>
           <div className="welcome-bg-layer welcome-bg-layer--full" aria-hidden="true">
-            {welcomeBackgroundCards.map((card) => (
-              <div key={card.key} className="welcome-bg-item" style={card.positionStyle}>
-                <div className="welcome-bg-float" style={card.floatStyle}>
-                  <img
-                    src={card.imageUrl}
-                    alt=""
-                    style={card.imageStyle}
-                    loading="lazy"
-                    decoding="async"
-                  />
+            <div className="welcome-marquee">
+              {welcomeMarqueeRows.map((row) => (
+                <div key={row.key} className={`welcome-marquee-row ${row.directionClass}`}>
+                  <div className="welcome-marquee-track" style={row.trackStyle}>
+                    {row.cards.map((card) => (
+                      <div key={card.key} className="welcome-marquee-card" style={card.style}>
+                        <img src={card.imageUrl} alt="" loading="lazy" decoding="async" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
           <div className="welcome-screen">
             <h1>かわいいポイントみつけます！</h1>
