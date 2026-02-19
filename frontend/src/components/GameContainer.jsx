@@ -146,7 +146,7 @@ const GameContainer = () => {
   const isWelcomeScreen = screen === 'welcome';
   const goToAdminPage = () => {
     if (typeof window === 'undefined') return;
-    window.history.pushState({}, '', '/admin');
+    window.history.pushState({}, '', '/#/admin');
     window.dispatchEvent(new Event('popstate'));
   };
 
