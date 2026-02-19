@@ -265,6 +265,20 @@ function normalizeHiragana(input) {
   return text;
 }
 
+function normalizeAdminFilter(input) {
+  const text = String(input || '').trim();
+  if (!text) return null;
+  const lower = text.toLowerCase();
+  if (lower === 'all' || lower === 'all_versions' || text === '全バージョン') return null;
+  return text;
+}
+
+function parseAdminLimit(input, fallback, max) {
+  const n = Number(input);
+  if (!Number.isFinite(n) || n < 0) return fallback;
+  return Math.min(Math.floor(n), max);
+}
+
 function pickRoundCard(room) {
   const poolCards = getCardsByVersion(room.selectedVersion);
   return sampleOne(poolCards);
@@ -495,6 +509,163 @@ app.get('/api/session/:id/cards', (req, res) => {
 
 app.get('/api/versions', (req, res) => {
   res.json({ versions: getAllowedVersions() });
+});
+
+// === Admin: 「どこが」集計/ログ
+app.get('/api/admin/hints', async (req, res) => {
+  if (!pool) return res.status(501).json({ error: 'db not configured' });
+
+  const versionFilter = normalizeAdminFilter(req.query.version);
+  const characterFilter = normalizeAdminFilter(req.query.character);
+  const summaryLimit = parseAdminLimit(req.query.summaryLimit, 0, 5000);
+  const recentLimit = parseAdminLimit(req.query.recentLimit, 160, 1000);
+
+  // hint_logs.clues は jsonb（文字列/配列どちらでも安全に取り出す）
+  const HINT_TEXT_SQL = `NULLIF(BTRIM(CASE
+    WHEN jsonb_typeof(clues) = 'array' THEN clues->>0
+    ELSE clues #>> '{}'
+  END), '')`;
+
+  const baseFilters = [
+    "target_char LIKE '%::%'",
+    `${HINT_TEXT_SQL} IS NOT NULL`,
+  ];
+  const baseValues = [];
+  let idx = 1;
+
+  if (versionFilter) {
+    baseFilters.push(`split_part(target_char, '::', 1) = $${idx++}`);
+    baseValues.push(versionFilter);
+  }
+  if (characterFilter) {
+    baseFilters.push(`split_part(target_char, '::', 2) = $${idx++}`);
+    baseValues.push(characterFilter);
+  }
+
+  const whereClause = baseFilters.join(' AND ');
+  const summaryLimitClause = summaryLimit > 0 ? `LIMIT ${summaryLimit}` : '';
+  const recentLimitClause = recentLimit > 0 ? `LIMIT ${recentLimit}` : '';
+
+  const charactersFilters = [
+    "target_char LIKE '%::%'",
+    `${HINT_TEXT_SQL} IS NOT NULL`,
+  ];
+  const charactersValues = [];
+  let cIdx = 1;
+  if (versionFilter) {
+    charactersFilters.push(`split_part(target_char, '::', 1) = $${cIdx++}`);
+    charactersValues.push(versionFilter);
+  }
+  const charactersWhereClause = charactersFilters.join(' AND ');
+
+  try {
+    const [summaryResult, recentResult, metaResult, versionsResult, charactersResult] =
+      await Promise.all([
+        pool.query(
+          `WITH base AS (
+             SELECT
+               split_part(target_char, '::', 1) AS version,
+               split_part(target_char, '::', 2) AS character_name,
+               ${HINT_TEXT_SQL} AS where_text
+             FROM hint_logs
+             WHERE ${whereClause}
+           )
+           SELECT
+             version,
+             character_name,
+             where_text,
+             COUNT(*)::int AS cnt
+           FROM base
+           GROUP BY version, character_name, where_text
+           ORDER BY version ASC, character_name ASC, cnt DESC, where_text ASC
+           ${summaryLimitClause}`,
+          baseValues
+        ),
+        pool.query(
+          `SELECT
+             id,
+             session_id,
+             round,
+             split_part(target_char, '::', 1) AS version,
+             split_part(target_char, '::', 2) AS character_name,
+             ${HINT_TEXT_SQL} AS where_text,
+             created_at
+           FROM hint_logs
+           WHERE ${whereClause}
+           ORDER BY created_at DESC
+           ${recentLimitClause}`,
+          baseValues
+        ),
+        pool.query(
+          `SELECT
+             COUNT(*)::int AS total_hints,
+             COUNT(DISTINCT split_part(target_char, '::', 2))::int AS unique_characters,
+             COUNT(DISTINCT ${HINT_TEXT_SQL})::int AS unique_keywords
+           FROM hint_logs
+           WHERE ${whereClause}`,
+          baseValues
+        ),
+        pool.query(
+          `SELECT DISTINCT split_part(target_char, '::', 1) AS version
+           FROM hint_logs
+           WHERE target_char LIKE '%::%'
+           ORDER BY version ASC`
+        ),
+        pool.query(
+          `SELECT DISTINCT split_part(target_char, '::', 2) AS character_name
+           FROM hint_logs
+           WHERE ${charactersWhereClause}
+           ORDER BY character_name ASC`,
+          charactersValues
+        ),
+      ]);
+
+    const loggedVersions = (versionsResult.rows || [])
+      .map((r) => String(r.version || '').trim())
+      .filter(Boolean);
+    const versions = Array.from(new Set([...getAllowedVersions(), ...loggedVersions]));
+
+    const metaRow = metaResult.rows?.[0] || {};
+    const summary = (summaryResult.rows || []).map((r) => ({
+      version: String(r.version || ''),
+      characterName: String(r.character_name || ''),
+      whereText: String(r.where_text || ''),
+      count: Number(r.cnt || 0),
+    }));
+    const recent = (recentResult.rows || []).map((r) => ({
+      id: r.id,
+      sessionId: r.session_id,
+      round: r.round,
+      version: String(r.version || ''),
+      characterName: String(r.character_name || ''),
+      whereText: String(r.where_text || ''),
+      createdAt: r.created_at,
+    }));
+    const characters = (charactersResult.rows || [])
+      .map((r) => String(r.character_name || '').trim())
+      .filter(Boolean);
+
+    return res.json({
+      ok: true,
+      filters: {
+        version: versionFilter,
+        character: characterFilter,
+      },
+      fetchedAt: new Date().toISOString(),
+      versions,
+      characters,
+      meta: {
+        totalHints: Number(metaRow.total_hints || 0),
+        uniqueCharacters: Number(metaRow.unique_characters || 0),
+        uniqueKeywords: Number(metaRow.unique_keywords || 0),
+      },
+      summary,
+      recent,
+    });
+  } catch (e) {
+    console.error('GET /api/admin/hints error:', e);
+    return res.status(500).json({ error: 'admin query failed' });
+  }
 });
 
 // === 互換API（バージョン別カード）

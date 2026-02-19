@@ -144,6 +144,11 @@ const GameContainer = () => {
   }, [welcomeCards]);
 
   const isWelcomeScreen = screen === 'welcome';
+  const goToAdminPage = () => {
+    if (typeof window === 'undefined') return;
+    window.history.pushState({}, '', '/admin');
+    window.dispatchEvent(new Event('popstate'));
+  };
 
   // ===== サーバのイベント購読（ゲーム進行・結果） =====
   useEffect(() => {
@@ -410,6 +415,9 @@ const GameContainer = () => {
                 onClick={() => { setScreen('join'); fetchRoomList(); }}
               >
                 <span className="icon">🎮</span> ルームに参加
+              </button>
+              <button className="secondary-button admin-link-button" onClick={goToAdminPage}>
+                <span className="icon">📊</span> データ管理ページ
               </button>
             </div>
           </div>

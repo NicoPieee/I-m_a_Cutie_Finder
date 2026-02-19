@@ -337,6 +337,10 @@ body {
     0 6px 14px rgba(238, 149, 190, 0.18);
 }
 
+.admin-link-button {
+  min-width: 220px;
+}
+
 .icon {
   font-size: 1.1rem;
 }
@@ -556,7 +560,8 @@ body {
     gap: 0.75rem;
   }
 
-  .welcome-buttons .primary-button {
+  .welcome-buttons .primary-button,
+  .welcome-buttons .secondary-button {
     width: 100%;
     justify-content: center;
   }

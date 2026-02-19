@@ -120,6 +120,21 @@ export const fetchMarkSteps = (sessionId, { playerId, round } = {}) => {
 export const fetchMarkSummary = (sessionId) =>
   jfetch(`${API}/api/session/${sessionId}/steps/summary`);
 
+export const fetchAdminHints = ({
+  version = '',
+  character = '',
+  summaryLimit = 0,
+  recentLimit = 160,
+} = {}) => {
+  const qs = new URLSearchParams();
+  if (version) qs.set('version', version);
+  if (character) qs.set('character', character);
+  if (summaryLimit != null) qs.set('summaryLimit', String(summaryLimit));
+  if (recentLimit != null) qs.set('recentLimit', String(recentLimit));
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return jfetch(`${API}/api/admin/hints${suffix}`);
+};
+
 // ★ 優先ピック用API
 export const fetchPrioritizedCards = async (limit = 10, excludeIds = []) => {
   const qs = new URLSearchParams({ limit: String(limit) });
