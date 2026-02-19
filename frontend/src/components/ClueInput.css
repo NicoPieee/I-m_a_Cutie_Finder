@@ -1,0 +1,246 @@
+/* src/components/ClueInput.css */
+
+.clue-input {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2.4vw, 28px);
+  align-items: stretch;
+}
+
+/* ===== Left: target ===== */
+.target-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(460px, 40vw);
+  width: 100%;
+  margin-inline: auto;
+}
+
+.target-figure__name {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: calc(1.25em * 2 + 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  background: linear-gradient(150deg, rgba(255, 248, 252, 0.95), rgba(255, 238, 246, 0.95));
+  box-shadow: 0 10px 26px rgba(236, 151, 191, 0.2);
+  color: #2b2b2b;
+  font-family: var(--font-title);
+  font-size: clamp(1rem, 1.45vw, 1.28rem);
+  line-height: 1.25;
+  text-align: center;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.target-figure__thumb {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  max-height: min(62vh, 540px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(8px, 1vw, 12px);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(255, 175, 214, 0.2), transparent 58%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(255, 240, 248, 0.96));
+  box-shadow: 0 12px 30px rgba(237, 152, 191, 0.22);
+  overflow: hidden;
+}
+
+.target-figure__thumb img {
+  max-width: 84%;
+  max-height: 84%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(228, 133, 177, 0.24));
+}
+
+/* ===== Right: input panel ===== */
+.clue-panel {
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(255, 234, 245, 0.93));
+  box-shadow: 0 14px 30px rgba(236, 152, 191, 0.22);
+  backdrop-filter: blur(6px);
+  padding: clamp(16px, 2vw, 24px);
+  display: flex;
+  flex-direction: column;
+}
+
+.clue-panel__title {
+  margin: 0 0 12px;
+  font-family: var(--font-title);
+  font-size: clamp(1.25rem, 2.2vw, 1.9rem);
+  line-height: 1.25;
+  color: #ff75ad;
+  text-shadow: 0 2px 8px rgba(255, 117, 173, 0.2);
+  letter-spacing: 0.02em;
+}
+
+.clue-panel__note {
+  margin: 0 0 14px;
+  color: #666666;
+  font-size: 0.9rem;
+}
+
+.clue-input__fields {
+  display: grid;
+  gap: 12px;
+  margin-bottom: clamp(14px, 2vw, 20px);
+}
+
+.clue-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.clue-field__fixed {
+  font-family: var(--font-ui);
+  color: #333333;
+  font-size: 0.95rem;
+}
+
+.clue-field__badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 3px 10px;
+  background: #ff75ad;
+  color: #fff;
+  font-size: 0.74rem;
+}
+
+.clue-field__input {
+  flex: 1;
+  min-width: 190px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 2px solid #f4cde2;
+  background: rgba(255, 255, 255, 0.95);
+  color: #2f2f2f;
+  font-size: 1.04rem;
+  font-family: var(--font-body);
+  padding: 12px 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.clue-field__input:focus {
+  outline: none;
+  border-color: #ff6ea8;
+  box-shadow: 0 0 0 3px rgba(255, 110, 168, 0.22);
+  transform: translateY(-1px);
+}
+
+.clue-input__submit {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-family: var(--font-ui);
+  font-size: 0.98rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: #c6acba;
+  cursor: not-allowed;
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  box-shadow:
+    0 4px 0 #b69dab,
+    0 8px 16px rgba(180, 144, 165, 0.24);
+}
+
+.clue-input__submit.is-active {
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffb2d7 0%, #ff8fbe 45%, #ff75ad 100%);
+  box-shadow:
+    0 7px 0 #ef5e9e,
+    0 12px 22px rgba(255, 93, 156, 0.34);
+}
+
+.clue-input__submit.is-active:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 9px 0 #ef5e9e,
+    0 14px 26px rgba(255, 93, 156, 0.42);
+}
+
+.clue-input__submit.is-active:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 3px 0 #ef5e9e,
+    0 8px 16px rgba(255, 93, 156, 0.3);
+}
+
+.clue-input__submit:disabled {
+  filter: saturate(0.85);
+}
+
+.clue-input__waiting {
+  margin: 12px 0 0;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  color: #666666;
+}
+
+.clue-input__toast {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 121, 174, 0.5);
+  background: linear-gradient(145deg, #ffeaf4, #ffdbe9);
+  color: #a13767;
+  font-size: 0.88rem;
+  font-weight: 700;
+  animation: toastIn 0.22s ease-out;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .clue-input {
+    grid-template-columns: 1fr;
+  }
+
+  .target-figure {
+    max-width: min(540px, 100%);
+  }
+
+  .target-figure__thumb {
+    aspect-ratio: 1 / 1;
+    max-height: min(54vh, 440px);
+  }
+}
+
+@media (max-width: 600px) {
+  .clue-panel {
+    padding: 14px 12px;
+  }
+
+  .clue-field {
+    gap: 6px;
+  }
+
+  .clue-field__input {
+    min-width: 140px;
+  }
+}

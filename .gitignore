@@ -1,0 +1,28 @@
+.DS_Store
+**/.DS_Store
+
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+build/
+frontend/build/
+dist/
+
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.vscode/
+.idea/
+
+# local scratch artifacts
+touch .gitignore
+tall
+tatus
+q

@@ -1,0 +1,53 @@
+/* src/index.css */
+
+:root {
+  color-scheme: light;
+  --pink-100: #fff6fc;
+  --pink-200: #ffe8f5;
+  --pink-300: #ffd2e9;
+  --pink-400: #ffb0d5;
+  --pink-500: #ff8fbe;
+  --pink-600: #ff75ad;
+  --pink-700: #ff5aa0;
+  --ink-900: #2b2328;
+  --ink-700: #4f4049;
+  --ink-500: #6f6068;
+  --panel-bg: rgba(255, 255, 255, 0.9);
+  --panel-border: rgba(255, 255, 255, 0.9);
+  --shadow-soft: rgba(244, 152, 196, 0.25);
+  --shadow-strong: rgba(255, 120, 175, 0.35);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Zen Maru Gothic", "Hiragino Kaku Gothic Pro", "Meiryo", sans-serif;
+  color: var(--ink-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background:
+    radial-gradient(920px 560px at 100% -10%, rgba(255, 186, 220, 0.52), transparent 60%),
+    radial-gradient(860px 560px at 0% 100%, rgba(255, 161, 206, 0.44), transparent 62%),
+    linear-gradient(145deg, #fffdfd 0%, #fff3fa 56%, #ffeaf6 100%);
+  background-attachment: fixed;
+}
+
+#root {
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 183, 218, 0.3) 1.2px, transparent 0);
+  background-size: 22px 22px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}

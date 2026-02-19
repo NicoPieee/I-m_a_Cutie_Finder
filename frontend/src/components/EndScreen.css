@@ -1,0 +1,288 @@
+/* src/components/EndScreen.css */
+
+.endscreen-bg {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 2.4vw, 24px);
+  background:
+    radial-gradient(980px 520px at 100% 0%, rgba(255, 190, 222, 0.46), transparent 60%),
+    radial-gradient(900px 560px at 0% 100%, rgba(255, 166, 208, 0.42), transparent 62%),
+    linear-gradient(145deg, #fffafd 0%, #fff0f8 60%, #ffe8f3 100%);
+}
+
+.endscreen-container {
+  width: min(100%, 860px);
+  border-radius: 24px;
+  padding: clamp(18px, 3vw, 30px);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(255, 243, 250, 0.93));
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 0 0 3px rgba(255, 214, 235, 0.42),
+    0 20px 46px rgba(239, 152, 191, 0.26);
+  backdrop-filter: blur(8px);
+  animation: endscreenIn 0.45s ease-out;
+  color: #2f2f2f;
+}
+
+@keyframes endscreenIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.endscreen-header {
+  margin-bottom: clamp(18px, 2.4vw, 24px);
+}
+
+.endscreen-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+  color: #ff75ad;
+  text-shadow: 0 3px 10px rgba(255, 117, 173, 0.32);
+  letter-spacing: 0.02em;
+}
+
+.score-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 1.8vw, 18px);
+  margin-bottom: clamp(20px, 2.8vw, 28px);
+}
+
+.score-display,
+.accuracy-display {
+  border-radius: 14px;
+  padding: clamp(12px, 1.8vw, 18px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.74);
+  border: 2px solid #f4d5e6;
+}
+
+.score-label,
+.accuracy-label {
+  margin-bottom: 6px;
+  font-size: 0.78rem;
+  color: #555555;
+  letter-spacing: 0.08em;
+  font-family: var(--font-ui);
+}
+
+.score-value,
+.accuracy-value {
+  margin: 0;
+  font-size: clamp(1.9rem, 4.4vw, 2.8rem);
+  font-family: var(--font-title);
+  color: #1f1f1f;
+}
+
+.score-subtitle,
+.accuracy-detail {
+  margin-top: 4px;
+  color: #666666;
+  font-size: 0.84rem;
+}
+
+.rounds-summary {
+  margin-bottom: clamp(18px, 2.6vw, 26px);
+}
+
+.rounds-title {
+  margin: 0 0 12px;
+  font-size: clamp(1.05rem, 2.5vw, 1.45rem);
+  color: #ff75ad;
+  font-family: var(--font-title);
+}
+
+.round-card {
+  display: grid;
+  gap: 10px;
+  padding: clamp(12px, 1.8vw, 18px);
+  margin-bottom: 10px;
+  border-radius: 14px;
+  border: 2px solid #f4d5e6;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 18px rgba(236, 149, 189, 0.2);
+}
+
+.round-card.matched {
+  border-color: rgba(255, 105, 170, 0.44);
+  background: linear-gradient(135deg, rgba(255, 228, 241, 0.96), rgba(255, 206, 227, 0.95));
+}
+
+.round-card.no-match {
+  border-color: rgba(191, 127, 158, 0.4);
+  background: linear-gradient(135deg, rgba(250, 235, 244, 0.95), rgba(243, 222, 234, 0.95));
+}
+
+.round-card.empty {
+  text-align: center;
+  color: #666666;
+  font-family: var(--font-ui);
+}
+
+.round-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.round-number {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: #555555;
+}
+
+.result-badge {
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: var(--font-ui);
+  font-size: 0.73rem;
+  letter-spacing: 0.06em;
+}
+
+.result-badge.correct {
+  background: #ff75ad;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(255, 117, 173, 0.28);
+}
+
+.result-badge.incorrect {
+  background: #af6a8d;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(175, 106, 141, 0.28);
+}
+
+.character-section {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.char-image {
+  max-width: min(100%, 220px);
+  max-height: clamp(90px, 15vw, 160px);
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 18px rgba(235, 151, 191, 0.2);
+}
+
+.char-name {
+  margin: 0;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  font-family: var(--font-title);
+  color: #2b2b2b;
+}
+
+.clues-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(242, 203, 224, 0.82);
+}
+
+.clue-item {
+  display: grid;
+  gap: 3px;
+  text-align: center;
+}
+
+.clue-owner {
+  font-size: 0.7rem;
+  color: #666666;
+  font-family: var(--font-ui);
+  letter-spacing: 0.04em;
+}
+
+.clue-text {
+  font-size: clamp(0.98rem, 1.8vw, 1.24rem);
+  font-weight: 900;
+  color: #2f2f2f;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: clamp(14px, 2vw, 20px);
+}
+
+.btn-restart,
+.btn-leave {
+  border-radius: 12px;
+  border: none;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.btn-restart {
+  background: linear-gradient(135deg, #ffb2d7 0%, #ff8fbe 45%, #ff75ad 100%);
+  color: #fff;
+  box-shadow:
+    0 7px 0 #ef5e9e,
+    0 10px 20px rgba(255, 93, 156, 0.36);
+}
+
+.btn-restart:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 9px 0 #ef5e9e,
+    0 12px 24px rgba(255, 93, 156, 0.46);
+}
+
+.btn-restart:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 3px 0 #ef5e9e,
+    0 6px 14px rgba(255, 93, 156, 0.3);
+}
+
+.btn-leave {
+  border: 2px solid rgba(181, 95, 142, 0.3);
+  background: rgba(255, 255, 255, 0.86);
+  color: #333333;
+  box-shadow:
+    0 5px 0 rgba(225, 162, 194, 0.7),
+    0 8px 16px rgba(238, 149, 190, 0.2);
+}
+
+.btn-leave:hover {
+  transform: translateY(-1px);
+  background: #fff2f8;
+}
+
+.btn-leave:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 0 rgba(225, 162, 194, 0.7),
+    0 4px 10px rgba(238, 149, 190, 0.16);
+}
+
+@media (max-width: 700px) {
+  .score-board,
+  .action-buttons,
+  .clues-section {
+    grid-template-columns: 1fr;
+  }
+}

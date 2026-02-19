@@ -1,0 +1,196 @@
+/* ===== レイアウト全体（左右分割） ===== */
+.guesser-shell {
+  width: min(1200px, 96vw);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr;        /* 左 ≒ 2/3、右 ≒ 1/3 */
+  gap: clamp(16px, 2.5vw, 24px);
+  padding: clamp(8px, 1.2vw, 16px);
+  box-sizing: border-box;
+}
+
+/* ===== 共通パネル ===== */
+.panel {
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid #f5d8e8;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 2px rgba(255, 214, 235, 0.42),
+    0 8px 22px rgba(236, 151, 191, 0.2);
+  padding: clamp(14px, 1.6vw, 20px);
+}
+.panel-title {
+  color: #ff75ad;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  font-size: clamp(16px, 1.4vw, 20px);
+  text-shadow: 0 2px 8px rgba(255, 117, 173, 0.24);
+}
+
+/* ===== 左：カード盤（2行×5列） ===== */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 1fr;
+  gap: clamp(10px, 1vw, 14px);
+
+  /* 名前行を消したぶん全体を少し低く */
+  height: clamp(260px, 30vw, 360px);
+
+  /* ホバー拡大がはみ出しても見えるように */
+  column-gap: 16px;
+  row-gap: 28px;
+  overflow: visible;
+}
+
+/* ===== カード ===== */
+.card-item {
+  border: 2px solid #f5d7e7;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(255, 145, 191, 0.26);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  transform-origin: center center; /* 拡大の基準を中央に */
+}
+
+/* PCホバー時だけ拡大＆最前面に */
+@media (hover: hover) {
+  .card-item:hover {
+    transform: scale(1.7);                         /* ★ 拡大率：好みで 1.10〜1.20 */
+    box-shadow: 0 14px 32px rgba(255, 109, 172, 0.38);
+    border-color: #ff6fad;
+    z-index: 20;                                    /* しっかり最前面へ */
+  }
+}
+
+/* 画像コンテナ */
+.card-thumb {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff2f9;
+  border-radius: 8px;
+  padding: 6px;
+}
+.card-thumb img {
+  max-width: 85%;
+  max-height: 85%;
+  object-fit: contain;
+  transition: transform .16s ease;                  /* 画像も少しだけ拡大 */
+}
+@media (hover: hover) {
+  .card-item:hover .card-thumb img {
+    transform: scale(1.06);
+  }
+}
+
+/* ===== 右：ヒント＆操作（sticky） ===== */
+.right-pane { position: relative; }
+.clues-panel { position: sticky; top: 12px; }
+
+.clues-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+  display: grid;
+  gap: 8px;
+}
+.clue-item {
+  background: #fff5fa;
+  border: 2px solid #f5d9e9;
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: #7d2f5f;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* ボタン */
+.controls { display: grid; gap: 10px; margin-top: 8px; text-align:center; }
+.btn { border: none; padding: 12px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: transform .2s, box-shadow .2s, filter .2s; }
+.btn.next {
+  background: linear-gradient(135deg, #ff9ec9 0%, #ff75ad 100%);
+  color:#fff;
+  box-shadow: 0 6px 0 #ef5e9e, 0 10px 18px rgba(255, 111, 170, 0.32);
+}
+.btn.next:hover{
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 8px 0 #ef5e9e, 0 12px 20px rgba(255, 111, 170, 0.38);
+}
+.btn.next:active{
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #ef5e9e, 0 6px 12px rgba(255, 111, 170, 0.28);
+}
+.btn.primary {
+  background: linear-gradient(135deg, #ffc3de 0%, #ff9ec9 100%);
+  color:#fff;
+  box-shadow: 0 6px 0 #f184b9, 0 10px 18px rgba(255, 140, 189, 0.3);
+}
+.btn.primary:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #f184b9, 0 12px 20px rgba(255, 140, 189, 0.36);
+}
+.btn.primary:active{
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #f184b9, 0 6px 12px rgba(255, 140, 189, 0.26);
+}
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; filter: grayscale(.15); }
+
+/* 結果表示 */
+.result-box { margin-top: 12px; padding: 10px 12px; border-radius: 12px; text-align: center; font-weight: 800; }
+.result-box.correct   { background:#ffe3f1; border:1px solid #ff75ad; color:#8a2d65; }
+.result-box.incorrect { background:#f6e6ef; border:1px solid #ba7e9f; color:#7b4763; }
+
+/* ツールチップ（下） */
+.card-tooltip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  transform: translateX(-50%);
+  transform-origin: top center;
+  background: rgba(181, 99, 140, 0.88);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  z-index: 9999;
+  pointer-events: none;
+  max-width: clamp(220px, 40vw, 420px);
+  min-width: 180px;
+  white-space: normal;
+  word-break: break-word;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
+  transform: translateX(-50%) translateY(4px);
+}
+.card-item:hover .card-tooltip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* レスポンシブ */
+@media (max-width: 980px) {
+  .guesser-shell { grid-template-columns: 1fr; }
+  .clues-panel { position: static; }
+  .board-grid { grid-template-columns: repeat(4, 1fr); height: auto; }
+  /* スマホ・タブはホバーが無い/不安定なので拡大は実質オフ */
+}
+@media (max-width: 640px) {
+  .board-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 動きが苦手な人向け：OS設定に追従 */
+@media (prefers-reduced-motion: reduce) {
+  .card-item, .card-thumb img, .card-tooltip {
+    transition: none !important;
+  }
+}

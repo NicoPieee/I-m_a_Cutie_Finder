@@ -1,0 +1,54 @@
+/* src/components/CardGrid.css */
+
+.cardgrid-bg {
+  min-height: 100vh;
+  background: #ffe4f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* グリッド本体 */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.2rem;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+/* 各カード */
+.card-item {
+  cursor: pointer;
+  border: 2px solid #f5d8e8;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(245, 165, 203, 0.24);
+  transition: transform 0.16s, box-shadow 0.16s, border 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-item:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(245, 129, 183, 0.36);
+  border: 2px solid #ff75ad;
+}
+
+.card-item img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  background: #fff2f9;
+  border-bottom: 1px solid #f3c8df;
+}
+
+.card-name {
+  margin: 0.5rem 0;
+  font-weight: bold;
+  color: #ff75ad;
+  text-shadow: 0 2px 8px rgba(255, 117, 173, 0.24);
+  font-size: 1.07rem;
+}
