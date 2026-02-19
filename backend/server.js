@@ -234,6 +234,7 @@ const io = new Server(server, {
  *   cluesBy:     { [pid]: string[] },
  *   guessesBy:   { [pid]: { cardId, correct, scored } },
  *   cardsFor:    { [pid]: string[] },
+ *   usedCardIds: Set<cardId>,
  *   pendingClues:   Set<playerId>,
  *   pendingGuesses: Set<playerId>,
  *   history: []
@@ -279,9 +280,17 @@ function parseAdminLimit(input, fallback, max) {
   return Math.min(Math.floor(n), max);
 }
 
+function getRoundLimitForVersion(version) {
+  const cardCount = getCardsByVersion(version).length;
+  if (cardCount <= 0) return 0;
+  return Math.min(TOTAL_ROUNDS_FIXED, cardCount);
+}
+
 function pickRoundCard(room) {
   const poolCards = getCardsByVersion(room.selectedVersion);
-  return sampleOne(poolCards);
+  const usedCardIds = room.usedCardIds instanceof Set ? room.usedCardIds : new Set();
+  const remainingCards = poolCards.filter((card) => !usedCardIds.has(card.id));
+  return sampleOne(remainingCards);
 }
 
 // ====== 公開状態 ======
@@ -322,9 +331,15 @@ async function startRound(room, reqLike) {
 
   const roundCard = pickRoundCard(room);
   if (!roundCard) {
-    console.error(`No cards found for version: ${room.selectedVersion}`);
+    console.warn(`No remaining cards for room: ${room.id} (${room.selectedVersion})`);
+    room.finished = true;
+    io.to(room.id).emit('update', publicState(room));
+    io.to(room.id).emit('gameFinished', publicState(room));
     return;
   }
+
+  if (!(room.usedCardIds instanceof Set)) room.usedCardIds = new Set();
+  room.usedCardIds.add(roundCard.id);
 
   room.cluesBy = {};
   room.assignments = {};
@@ -358,6 +373,7 @@ async function tryStartGame(room) {
   room.currentRound = 1;
   room.pairScore = 0;
   room.history = [];
+  room.usedCardIds = new Set();
 
   io.to(room.id).emit('gameStart', publicState(room));
   await startRound(room);
@@ -430,8 +446,9 @@ app.post('/api/rooms', (req, res) => {
   const requestedVersion = String(req.body?.version || '').trim();
   const versions = getAllowedVersions();
   const selectedVersion = versions.includes(requestedVersion) ? requestedVersion : versions[0] || '';
+  const totalRounds = getRoundLimitForVersion(selectedVersion);
 
-  if (!selectedVersion) {
+  if (!selectedVersion || totalRounds <= 0) {
     return res.status(400).json({ error: 'no image versions found' });
   }
 
@@ -442,15 +459,16 @@ app.post('/api/rooms', (req, res) => {
     started: false,
     finished: false,
     currentRound: 0,
-    totalRounds: TOTAL_ROUNDS_FIXED,
+    totalRounds,
     pairScore: 0,
     assignments: {},
     cluesBy: {},
+    usedCardIds: new Set(),
     pendingClues: new Set(),
     history: [],
   };
   rooms.set(roomId, room);
-  res.json({ roomId, selectedVersion, totalRounds: TOTAL_ROUNDS_FIXED });
+  res.json({ roomId, selectedVersion, totalRounds });
 });
 
 app.post('/api/rooms/:id/join', async (req, res) => {
