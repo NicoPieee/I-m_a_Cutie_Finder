@@ -9,6 +9,10 @@ const { Pool } = require('pg');
 
 const TOTAL_ROUNDS_FIXED = 5;
 const MAX_PLAYERS = 2;
+const WAITING_ROOM_TIMEOUT_MS = Math.max(
+  15000,
+  Number(process.env.WAITING_ROOM_TIMEOUT_MS || 120000)
+);
 
 // ====== 環境変数 ======
 const PORT = process.env.PORT || 4000;
@@ -242,6 +246,7 @@ const io = new Server(server, {
  */
 const rooms = new Map();
 const socketToPlayer = new Map(); // socket.id -> { roomId, playerId }
+const waitingRoomTimers = new Map(); // roomId -> timeout handle
 
 function createRoomId() {
   return Math.random().toString(36).slice(2, 8).toUpperCase();
@@ -249,6 +254,40 @@ function createRoomId() {
 function createPlayerId() {
   return Math.random().toString(36).slice(2, 10);
 }
+
+function clearWaitingRoomTimer(roomId) {
+  const timer = waitingRoomTimers.get(roomId);
+  if (timer) clearTimeout(timer);
+  waitingRoomTimers.delete(roomId);
+}
+
+function closeRoom(roomId, reason = 'closed') {
+  clearWaitingRoomTimer(roomId);
+  if (!rooms.has(roomId)) return false;
+  rooms.delete(roomId);
+  io.to(roomId).emit('roomClosed', { roomId, reason });
+  return true;
+}
+
+function scheduleWaitingRoomTimeout(room, delayMs = WAITING_ROOM_TIMEOUT_MS) {
+  if (!room || !room.id) return;
+
+  if (room.started || room.finished) {
+    clearWaitingRoomTimer(room.id);
+    return;
+  }
+
+  clearWaitingRoomTimer(room.id);
+  const timeoutMs = Math.max(5000, Number(delayMs) || WAITING_ROOM_TIMEOUT_MS);
+  const timer = setTimeout(() => {
+    waitingRoomTimers.delete(room.id);
+    const latest = rooms.get(room.id);
+    if (!latest || latest.started || latest.finished) return;
+    closeRoom(latest.id, 'waiting_timeout');
+  }, timeoutMs);
+  waitingRoomTimers.set(room.id, timer);
+}
+
 function sampleOne(arr) {
   if (!arr.length) return null;
   return arr[Math.floor(Math.random() * arr.length)];
@@ -374,6 +413,7 @@ async function tryStartGame(room) {
   room.pairScore = 0;
   room.history = [];
   room.usedCardIds = new Set();
+  clearWaitingRoomTimer(room.id);
 
   io.to(room.id).emit('gameStart', publicState(room));
   await startRound(room);
@@ -468,6 +508,7 @@ app.post('/api/rooms', (req, res) => {
     history: [],
   };
   rooms.set(roomId, room);
+  scheduleWaitingRoomTimeout(room);
   res.json({ roomId, selectedVersion, totalRounds });
 });
 
@@ -489,6 +530,7 @@ app.post('/api/rooms/:id/join', async (req, res) => {
     score: 0,
   };
   if (!room.players.find((p) => p.id === pid)) room.players.push(player);
+  scheduleWaitingRoomTimeout(room);
 
   io.to(room.id).emit('lobbyUpdate', publicState(room));
   await tryStartGame(room);
@@ -889,6 +931,7 @@ io.on('connection', (socket) => {
 
     socketToPlayer.set(socket.id, { roomId, playerId });
     io.to(roomId).emit('lobbyUpdate', publicState(room));
+    scheduleWaitingRoomTimeout(room);
 
     await tryStartGame(room);
 
@@ -968,9 +1011,10 @@ io.on('connection', (socket) => {
         (p) => p.socketId && io.sockets.sockets.get(p.socketId)
       );
       if (!someoneConnected) {
-        rooms.delete(roomId);
-        io.to(roomId).emit('roomClosed', { roomId });
+        closeRoom(roomId, 'all_disconnected');
+        return;
       }
+      scheduleWaitingRoomTimeout(r);
     }, 5000);
   });
 });
