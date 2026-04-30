@@ -1069,7 +1069,7 @@ app.get('/healthz/db', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.status(200).send('Yuru_Karuta_backend is up ✅');
+  res.status(200).send('Cutie_Finder_api is up ✅');
 });
 
 // ====== 起動 ======
