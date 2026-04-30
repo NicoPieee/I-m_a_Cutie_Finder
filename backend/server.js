@@ -573,12 +573,30 @@ app.get('/api/versions', (req, res) => {
 
 // === Admin: 「どこが」集計/ログ
 app.get('/api/admin/hints', async (req, res) => {
-  if (!pool) return res.status(501).json({ error: 'db not configured' });
-
   const versionFilter = normalizeAdminFilter(req.query.version);
   const characterFilter = normalizeAdminFilter(req.query.character);
   const summaryLimit = parseAdminLimit(req.query.summaryLimit, 0, 5000);
   const recentLimit = parseAdminLimit(req.query.recentLimit, 160, 1000);
+
+  if (!pool) {
+    return res.json({
+      ok: true,
+      filters: {
+        version: versionFilter,
+        character: characterFilter,
+      },
+      fetchedAt: new Date().toISOString(),
+      versions: getAllowedVersions(),
+      characters: [],
+      meta: {
+        totalHints: 0,
+        uniqueCharacters: 0,
+        uniqueKeywords: 0,
+      },
+      summary: [],
+      recent: [],
+    });
+  }
 
   // hint_logs.clues は jsonb（文字列/配列どちらでも安全に取り出す）
   const HINT_TEXT_SQL = `NULLIF(BTRIM(CASE

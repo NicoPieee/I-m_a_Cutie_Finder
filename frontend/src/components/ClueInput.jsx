@@ -10,29 +10,44 @@ export default function ClueInput({
 }) {
   const [value, setValue] = useState('');
   const [toast, setToast] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
 
   const canSubmit = useMemo(() => value.trim().length > 0, [value]);
 
-  const handleChange = (v) => {
+  const normalizeDraft = (v) => {
     const normalized = String(v || '').normalize('NFKC');
-    // IME入力中の英数文字を許す（例：「k」→「か」の変換待機中）
-    // ひらがな以外で、英数・空白でもない場合だけ拒否
-    if (/^[ぁ-ゖー゛゜a-zA-Z0-9 ]*$/.test(normalized)) {
-      setValue(normalized);
+    return normalized.replace(/[^ぁ-ゖー゛゜a-zA-Z0-9 ]/g, '');
+  };
+
+  const handleChange = (v) => {
+    if (isComposing) {
+      setValue(String(v || ''));
+      return;
     }
+    setValue(normalizeDraft(v));
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (v) => {
+    setIsComposing(false);
+    setValue(normalizeDraft(v));
   };
 
   const handleSubmit = () => {
     if (!canSubmit) return;
     // 英数が含まれていたかチェック
-    const hasNonHiragana = /[a-zA-Z0-9 ]/.test(value);
+    const normalized = String(value || '').normalize('NFKC');
+    const hasNonHiragana = /[a-zA-Z0-9 ]/.test(normalized);
     if (hasNonHiragana) {
       setToast('ひらがなだけにしてね！');
       setTimeout(() => setToast(''), 2500);
       return; // 送信しない
     }
     // ひらがなのみ送信
-    const hiraganaOnly = value.replace(/[^ぁ-ゖー゛゜]/g, '').trim();
+    const hiraganaOnly = normalized.replace(/[^ぁ-ゖー゛゜]/g, '').trim();
     if (hiraganaOnly.length > 0) {
       onSubmit?.(hiraganaOnly);
     }
@@ -65,6 +80,8 @@ export default function ClueInput({
               value={value}
               placeholder="ひらがなで入力"
               onChange={(e) => handleChange(e.target.value)}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={(e) => handleCompositionEnd(e.target.value)}
               inputMode="hiragana"
               disabled={disabled}
             />
