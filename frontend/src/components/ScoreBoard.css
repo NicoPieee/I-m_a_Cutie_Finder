@@ -1,0 +1,22 @@
+/* src/components/ScoreBoard.css */
+.scoreboard {
+  background: linear-gradient(135deg, #ffe7f2, #ffd8ea);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1.5rem auto;
+  max-width: 300px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 14px rgba(236, 151, 191, 0.2);
+  text-align: center;
+}
+.scoreboard h3 {
+  font-size: 1.5rem;
+  color: #ff75ad;
+  text-shadow: 0 2px 8px rgba(255, 117, 173, 0.24);
+  margin: 0.2rem 0;
+}
+.scoreboard p {
+  font-size: 1.1rem;
+  color: #6f3456;
+  margin: 0.2rem 0;
+}

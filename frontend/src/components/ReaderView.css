@@ -1,0 +1,137 @@
+/* src/components/ReaderView.css */
+
+.reader-view {
+  width: 100%;
+}
+
+/* ===== 送信後待機 ===== */
+.reader-view-submitted {
+  position: relative;
+}
+
+/* ===== ラウンド結果 ===== */
+.reader-view .round-result-display {
+  display: grid;
+  gap: clamp(14px, 2vw, 22px);
+  justify-items: center;
+  padding: clamp(16px, 2.5vw, 26px);
+  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.93), rgba(255, 234, 245, 0.91));
+  box-shadow:
+    0 0 0 2px rgba(255, 212, 233, 0.44),
+    0 16px 34px rgba(236, 151, 191, 0.24);
+  backdrop-filter: blur(6px);
+  animation: resultIn 0.35s ease-out;
+}
+
+@keyframes resultIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-target {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.result-target-image {
+  max-width: min(330px, 56vw);
+  max-height: min(400px, 62vh);
+  object-fit: contain;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 22px rgba(236, 151, 191, 0.2);
+}
+
+.result-target-name {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: #ff75ad;
+  text-shadow: 0 2px 6px rgba(255, 117, 173, 0.18);
+}
+
+.result-clues {
+  width: min(100%, 470px);
+  display: grid;
+  gap: 10px;
+}
+
+.clue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  border: 2px solid #f5d8e8;
+  background: linear-gradient(140deg, #fff5fa 0%, #ffeef6 100%);
+}
+
+.clue-label {
+  font-size: 0.75rem;
+  font-family: var(--font-ui);
+  letter-spacing: 0.05em;
+  color: #666666;
+}
+
+.clue-value {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  font-weight: 900;
+  color: #2f2f2f;
+}
+
+.result-verdict {
+  min-width: min(90%, 330px);
+  text-align: center;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-family: var(--font-title);
+  font-size: clamp(1.2rem, 2.8vw, 1.9rem);
+  letter-spacing: 0.04em;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.result-verdict.matched {
+  color: #8b1f5f;
+  background: linear-gradient(135deg, #ffe2f2, #ffcde9);
+  box-shadow: 0 10px 20px rgba(255, 97, 166, 0.3);
+}
+
+.result-verdict.no-match {
+  color: #444444;
+  background: linear-gradient(135deg, #fff0f7, #f8e7f1);
+  box-shadow: 0 10px 20px rgba(167, 103, 137, 0.2);
+}
+
+.result-auto-next {
+  margin: 0;
+  color: #666666;
+  font-size: 0.86rem;
+  font-family: var(--font-ui);
+}
+
+@media (max-width: 740px) {
+  .reader-view .round-result-display {
+    padding: 14px 10px;
+  }
+
+  .result-target-image {
+    max-width: min(300px, 78vw);
+    max-height: min(380px, 58vh);
+  }
+
+  .clue-row {
+    flex-direction: column;
+    text-align: center;
+  }
+}

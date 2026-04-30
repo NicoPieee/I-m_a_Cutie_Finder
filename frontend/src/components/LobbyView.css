@@ -1,0 +1,111 @@
+/* src/components/LobbyView.css */
+
+.lobby-bg {
+  width: 100%;
+  min-height: 72dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.lobby-container {
+  width: min(92vw, 520px);
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+  border-radius: 24px;
+  text-align: center;
+  color: #2f2f2f;
+  background: linear-gradient(160deg, rgba(255, 252, 254, 0.95), rgba(255, 236, 246, 0.93));
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  box-shadow:
+    0 0 0 2px rgba(255, 206, 228, 0.42),
+    0 16px 36px rgba(239, 154, 194, 0.22);
+  backdrop-filter: blur(6px);
+}
+
+.lobby-title {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  color: #ff75ad;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 8px rgba(255, 117, 173, 0.22);
+}
+
+.lobby-session {
+  margin: 0.55rem 0 1.4rem;
+  font-family: var(--font-ui);
+  color: #555555;
+  font-size: 0.94rem;
+}
+
+.lobby-session-id {
+  letter-spacing: 0.06em;
+  color: #ff75ad;
+}
+
+.lobby-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.35rem;
+  display: grid;
+  gap: 0.72rem;
+}
+
+.lobby-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.68rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(130deg, #fff3f9 0%, #ffeaf4 100%);
+  border: 2px solid #f7d8e9;
+  color: #2f2f2f;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lobby-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.lobby-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.78rem 1.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.lobby-btn-back {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333333;
+  border: 2px solid rgba(186, 88, 138, 0.26);
+  box-shadow:
+    0 4px 0 rgba(225, 162, 194, 0.7),
+    0 8px 16px rgba(238, 149, 190, 0.2);
+}
+
+.lobby-btn-back:hover {
+  transform: translateY(-2px);
+  background: #fff2f8;
+}
+
+.lobby-btn-back:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 2px 0 rgba(225, 162, 194, 0.7),
+    0 4px 10px rgba(238, 149, 190, 0.16);
+}
+
+.lobby-started {
+  margin-top: 1rem;
+  font-family: var(--font-ui);
+  font-size: 0.84rem;
+  color: #666666;
+  letter-spacing: 0.04em;
+}
